@@ -1,0 +1,23 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
+
+# IntelliJ IDEA settings
+.idea/
+*.iml
+.idea/*.xml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Common system files
+*.class
+*.log
+*.jar
+*.war
+*.ear

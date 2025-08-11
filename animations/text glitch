@@ -1,0 +1,57 @@
+@keyframes glitch {
+        0% {
+          top: 0px;
+          left: 0px;
+        }
+
+        20% {
+          top: -5px;
+          left: -5px;
+        }
+
+        40% {
+          top: 5px;
+          left: 5px;
+        }
+
+        60% {
+          top: -5px;
+          left: 5px;
+        }
+
+        80% {
+          top: 5px;
+          left: -5px;
+        }
+
+        100% {
+          top: 0px;
+          left: 0px;
+        }
+      }
+
+      .glitch {
+          position: relative;
+          letter-spacing: 2px;
+          cursor: pointer;
+     } 
+.glitch::before, .glitch::after {
+     content: '';
+     display: block;
+     position: absolute;
+     top: 0px;
+     left: 0px;
+}
+
+
+.glitch:hover::before {
+     animation: glitch 0.3s linear 10000;
+     color: #e91e63;
+     z-index: -2;
+}
+
+.glitch:hover::after {
+     animation: glitch 0.3s linear 10000 reverse;
+     color: #2196f3;
+     z-index: -1;
+}
