@@ -1,4 +1,4 @@
-let gameText = document.getElementById('gameTextDiv');
+let gameTextDiv = document.getElementById('gameTextDiv');
 let locationText = document.getElementById('locationName');
 
 let backgroundMusic = new Audio('');
@@ -1265,4 +1265,3 @@ const textNodesArray = [
         ]
     }
 ];
-// I think it'll be best to not place any thing beneath this so you don't have to scroll down all the rooms to get to something down here
