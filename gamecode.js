@@ -14,7 +14,16 @@ let booksound = new Audio('audio/UI/book.wav');
 booksound.volume = 0.45;
 
 let clockSound = new Audio('audio/UI/clock.wav');
-clockSound.volume = 0.45;
+clockSound.volume = 0.1;
+
+let deathSound = new Audio('audio/UI/death.mp3');
+deathSound.volume = 0.45;
+
+let QTESound = new Audio('audio/UI/qte.mp3');
+QTESound.volume = 0.45;
+
+let encounterSound = new Audio('audio/UI/encounter.mp3');
+encounterSound.volume = 0.45;
 
 //Prevents refresh on submitting the form (Player Name)
 var form = document.getElementById("enterName");
@@ -58,7 +67,7 @@ var rangeValue = 0 ;
 const positions = [];
 
 let currentID = 1;
-let midnightMan = 19;
+let midnightMan
 
 var journalBody = document.getElementById("journalContents");
 //Accessing the main body of text for the journal
@@ -69,37 +78,29 @@ function survivalTimer(){
     return setInterval(() => {
         gameTimer++;
         console.log(gameTimer);
-        let min = convertToMin(gameTimer);
-        let sec = convertToSec(min, gameTimer);
-        console.log(`${min} Minutes ${sec} Seconds`);
     }, 1000);
 }
+
 setInterval(journalStartUp, 999);
 function journalStartUp() {
-if (gameTimer == 1) {
-//Stating these timeouts should commence counting down once the game starts (it should say gameTimer = 299, as that's when the game actually starts)
-    setTimeout(firstEntry, 30000)
-    //Half a minute has passed
-    setTimeout(secondEntry, 120000)
-    //2 Minutes has passed
-    setTimeout(thirdEntry, 180000)
-    //3 Minutes has passed
-    setTimeout(fourthEntry, 240000)
-    //4 Minutes has passed
+    if (gameTimer == 1) {
+    //Stating these timeouts should commence counting down once the game starts (it should say gameTimer = 299, as that's when the game actually starts)
+        setTimeout(firstEntry, 30000)
+        //Half a minute has passed
+        setTimeout(secondEntry, 120000)
+        //2 Minutes has passed
+        setTimeout(thirdEntry, 180000)
+        //3 Minutes has passed
+        setTimeout(fourthEntry, 240000)
+        //4 Minutes has passed
 
-//Bell chimes
-    setTimeout(clockChime, 57000)
-    //Chimes at one minute mark
-    setTimeout(clockChime, 117000)
-    //Chimes at two minute mark
-    setTimeout(clockChime, 177000)
-    //Chimes at three minute mark
-    setTimeout(clockChime, 237000)
-    //Chimes at four minute mark
-    setTimeout(clockChime, 297000)
-    
-    //Chimes at five minute mark
-} 
+        //Bell chimes
+        setInterval(() => {
+            if(gameTimer == 57 || gameTimer == 117 || gameTimer == 177 || gameTimer == 237 || gameTimer == 297){
+                clockChime()
+            }
+        }, 1*1000);
+    }
 }
 function firstEntry() {
     //Adding first timeout piece of text to journal
@@ -110,7 +111,6 @@ function firstEntry() {
     accessJournal.style.borderColor = "red";
     }
 
-
 function secondEntry() {
     //Adding second timeout piece of text to journal
     journalBody.appendChild(document.createElement("br"));
@@ -118,7 +118,6 @@ function secondEntry() {
     var entryTwo = document.createTextNode("Bright lights have been found to attract The Midnight Man so don't stay in the entrance hall too long. You might regret it.");
     journalBody.appendChild(entryTwo);
     accessJournal.style.borderColor = "red";
-
 }
 
 function thirdEntry() {
@@ -128,7 +127,6 @@ function thirdEntry() {
     var entryThree = document.createTextNode("The mansion has four levels, some more safe than others.");
     journalBody.appendChild(entryThree);
     accessJournal.style.borderColor = "red";
-
 }
 
 function fourthEntry() {
@@ -138,7 +136,6 @@ function fourthEntry() {
     var entryFour = document.createTextNode("It's your fault he's here. Why did you bring him here. What is wrong with you. WHY. WHY. WHY. WH");
     journalBody.appendChild(entryFour);
     accessJournal.style.borderColor = "red";
-
 }
 
 let encounterEntries = ["It is believed that before he takes your life, the last moments of all his previous victims will flash before your eyes, filling your mind until it feels like your head will burst. The acute organ failure that follows is often instantaneous.",
@@ -167,7 +164,8 @@ function getPossibleIDs(ID){
     node.optionsArray.forEach(playerOption =>{
         positions.push(playerOption.nextId);
     })  
-    console.log(node.locat + ", Current ID : "+node.id);
+
+    console.log(positions);
 
     if (node.id == currentID && sprite.classList.contains("hide")) {
         sprite.classList.remove("hide");
@@ -219,7 +217,7 @@ function getDiceRoll(){
 }
 
 function diceRollRange(max){
-    // console.log("Max value : "+max);
+    console.log("Max value : "+ max);
     if (max == 1){
         rangeDiceResult.pop()
         rangeDiceResult.push(1);
@@ -240,7 +238,12 @@ function diceRollRange(max){
             }
             );
     }
+    // One major issue I noticed with the API is that it sometimes returned numbers that were outside of the range I gave it
+    // For example, if the max number was 2, meaning it had to generate a number between 1 and 2, it would sometime return 3
+    // This causes the Midnight Man to break completely.
+    // The code below checks if such an instance has occured and overrules the number with a random number generator instead.
     if (rangeDiceResult[0] > max){
+        console.log("There is an error!!");
         rangeDiceResult.pop()
         rangeDiceResult.push(Math.floor(Math.random() * max) + 1)
     }
@@ -252,9 +255,36 @@ function killPlayer() {
         console.log("GAMEOVER!");
         gameOver();
     }
+}
+
+function checkIDs(playerID, midnightID){
+
+    console.log("PlayerID : "+ playerID +" , " + "MidnightID : " + midnightID);
+
+    if (playerID == midnightID && sprite.classList.contains("hide") && gameTimer > 30) {
+        sprite.classList.remove("hide");
+        spriteVisible = true;
+        console.log("appears")
+
+    }
+    else {
+        sprite.classList.add("hide");
+        spriteVisible = false;
+    }
+
+    trackedIDPlayer = playerID;
+    trackedIDMidnight = midnightID;
+
+    checkSprite = document.getElementById("sprite");
+
+    if (playerID == midnightID && gameTimer > 30 && spriteVisible){
+        encounterSound.play();
+        locName = document.getElementById("locationName");
+        locName.classList.add("shakeup");
+        setTimeout(killPlayer(), 5*1000);
+    }
     else{
-        
-        console.log("DIFFERENT");
+        locName.classList.remove("shakeup");
     }
 }
 
@@ -262,35 +292,26 @@ function startHunt(){
     return setInterval(function(){
         getPossibleIDs(midnightMan);
         diceRollRange(positions.length);
+        console.log(rangeDiceResult[0])
         value = rangeDiceResult[0]
         midnightMan = positions[value-1];
         checkIDs(currentID, midnightMan);
-    },1*4000); // 7*1000
-
-    /*
-    setInterval(function(){
-        let roll = getDiceRoll();
-        if (roll == 6){
-            console.log("Teleport!")
-        }
-    },31*1000)
-    */
+    },7*1000);
 }
 
 function randomEvent(){
     return setInterval(() => {
         getDiceRoll();
-        console.log(diceResult[0]);
+        console.log("diceResult : " + diceResult[0])
         if (diceResult[0] == 6){
-            console.log("Trigger QTE!!");
+            QTEpopup();
         }
-    }, 1*20000);
+    }, 20*1000);
 }
 
 var huntAI;
 var gametime;
-
-const testing = randomEvent();
+var testing
 
 function gameStart() {
     answer = document.getElementById("playerName").value;
@@ -312,8 +333,10 @@ function restartGame() {
 
 function gameOver(){
     isGameOver = true;
+    deathSound.play();
     
     clearInterval(huntAI);
+    clearInterval(testing);
     stopTimer();
     clearInterval(gametime);
     
@@ -321,7 +344,7 @@ function gameOver(){
     for (let i = 0; i < removeImages.length; i++) {
         removeImages[i].classList.add("hide");
     }
-const removeText = document.querySelectorAll(".text");
+    const removeText = document.querySelectorAll(".text");
     for (let i = 0; i < removeText.length; i++) {
         removeText[i].classList.add("hide");
     }
@@ -335,8 +358,17 @@ const removeText = document.querySelectorAll(".text");
 
     const survivalTime = document.getElementById("youDied");
     survivalTime.classList.remove("hide")
-    survivalTime.innerHTML = "You survived for "+ gameTimer + " seconds. ";
-
+    minutes = convertToMin(gameTimer);
+    seconds = convertToSec(minutes, gameTimer);
+    if (gameTimer < 60){
+        survivalTime.innerHTML = "You survived for "+ gameTimer + " seconds. ";
+    }
+    else if(gameTimer > 60 && gameTimer < 120){
+        survivalTime.innerHTML = "You survived for "+ minutes + " minute and " + seconds + " seconds. ";
+    }
+    else{
+        survivalTime.innerHTML = "You survived for "+ minutes + " minutes and " + seconds + " seconds. ";
+    }
     const causeOfD = document.getElementById("causeOf");
     causeOfD.classList.remove("hide")
     causeOfD.innerHTML = "Cause of death: "+ (causeOfDeath);
@@ -355,6 +387,7 @@ const removeText = document.querySelectorAll(".text");
 }
 function gameComplete() {
     clearInterval(huntAI);
+    clearInterval(testing);
     stopTimer();
     clearInterval(gametime);
         const removeImages = document.querySelectorAll(".images");
@@ -391,6 +424,8 @@ function clockChime() {
 function pause(){
     stopTimer();
     clearInterval(huntAI);
+    clearInterval(gametime);
+    clearInterval(testing);
     console.log("PAUSE");
     
 }
@@ -409,6 +444,8 @@ function resumeQTE(){
 function resume(){
     startTimer();
     huntAI = startHunt();
+    gametime = survivalTimer();
+    testing = randomEvent();
     console.log("RESUME");    
 }
 
@@ -425,7 +462,7 @@ function convertToSec(min, time){
 
 function stopTimer(){
     clearInterval(timer);
-    remaining = 35;
+    remaining = 40;
 }
 
 function startTimer(){
@@ -510,81 +547,84 @@ function endQTE() {
             firstEntryGenerated = "appended";
         }
 }
+
 function QTEpopup() {
-pauseQTE();
+    
+    pause();
+    QTESound.play();
 
-var modal = document.getElementById("QTEModal");
-modal.style.display = "block";
+    var modal = document.getElementById("QTEModal");
+    modal.style.display = "block";
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-    let finished = false;
-    let timeEnded = false;
-    let placeLetter = document.getElementById("letter");
-    let playerLetter = document.getElementById("correspond");
-    let sym = document.getElementById("sym");
-    const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
-    const letters = [];
-
-    for(let i = 0; i < Math.floor(Math.random() *9)+6; i++){
-        letters.push(alphabet[Math.floor(Math.random() * alphabet.length)]);
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+    modal.style.display = "none";
     }
+        let finished = false;
+        let timeEnded = false;
+        let placeLetter = document.getElementById("letter");
+        let playerLetter = document.getElementById("correspond");
+        let sym = document.getElementById("sym");
+        const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+        const letters = [];
 
-    // document.getElementById("list").innerHTML = letters;
+        for(let i = 0; i < Math.floor(Math.random() *9)+6; i++){
+            letters.push(alphabet[Math.floor(Math.random() * alphabet.length)]);
+        }
 
-    let pointer = 0;
-    console.log(letters.length)
-    placeLetter.innerHTML = letters[pointer];
+        // document.getElementById("list").innerHTML = letters;
 
-    window.addEventListener("keydown", validate)
+        let pointer = 0;
+        console.log(letters.length)
+        placeLetter.innerHTML = letters[pointer];
 
-    setTimeout(function(){
-            if(!finished){
-                timeEnded = true;
-                placeLetter.innerHTML = "Dead";
-                causeOfDeath = "Failed Quick-Time-Event";
-                var modal = document.getElementById("QTEModal");
-                modal.remove();
-                gameOver();
+        window.addEventListener("keydown", validate)
+
+        setTimeout(function(){
+                if(!finished){
+                    timeEnded = true;
+                    placeLetter.innerHTML = "Dead";
+                    causeOfDeath = "Failed Quick-Time-Event";
+                    var modal = document.getElementById("QTEModal");
+                    modal.remove();
+                    gameOver();
+                }
+            },7*1500)
+
+        function validate(){
+            let userInput = event.key.toUpperCase();
+            // playerLetter.innerHTML = userInput;
+            
+            if(finished){
+                console.log("I GOT HERE");
+                timesSurvived += 1;
             }
-        },7*1500)
-
-    function validate(){
-        let userInput = event.key.toUpperCase();
-        // playerLetter.innerHTML = userInput;
-        
-        if(finished){
-            console.log("I GOT HERE");
-            timesSurvived += 1;
-        }
-        else if(timeEnded){
-            placeLetter.innerHTML = "Dead";
-        }
-        else{
-            // playerLetter.innerHTML = pointer + 1 + " " + letters.length;
-            if(pointer+1 == letters.length && userInput == letters[letters.length - 1]){
-                placeLetter.innerHTML = "You survived...this time";
-                setTimeout(endQTE, 2500);
-                resumeQTE();
-                finished = true;
+            else if(timeEnded){
+                placeLetter.innerHTML = "Dead";
             }
             else{
-                if(userInput == letters[pointer]){
-                    pointer++;
-                    placeLetter.innerHTML = letters[pointer];
+                // playerLetter.innerHTML = pointer + 1 + " " + letters.length;
+                if(pointer+1 == letters.length && userInput == letters[letters.length - 1]){
+                    placeLetter.innerHTML = "You survived...this time";
+                    setTimeout(endQTE, 2500);
+                    resume();
+                    finished = true;
                 }
                 else{
-                    pointer = 0;
-                    placeLetter.innerHTML = letters[pointer];
+                    if(userInput == letters[pointer]){
+                        pointer++;
+                        placeLetter.innerHTML = letters[pointer];
+                    }
+                    else{
+                        pointer = 0;
+                        placeLetter.innerHTML = letters[pointer];
+                    }
                 }
             }
         }
-    }
 
 
     // TIMERS
@@ -623,8 +663,12 @@ function startGame(){
     document.getElementById('gameTextDiv').style.display="block";
     clicksound.play();
     showNode(currentID);
-    huntAI = startHunt();
     gametime = survivalTimer();
+    setTimeout(() => {
+        midnightMan = 19;
+        huntAI = startHunt();
+        testing = randomEvent();
+    }, 30*1000);
 }
 
 let journalClick = false;
@@ -698,6 +742,11 @@ function showNode(nodePointer){
     currentID = currentNode.id;
     // console.log(currentID);
 
+    let previousBgMusic = backgroundMusic.src;
+
+    let splitted = previousBgMusic.split("Code/");
+    previousBgMusic = splitted[1];
+    previousBgMusic = previousBgMusic.replace("%20"," ");
     /**
      * This is basically a way of formating the file path so that it is the same as the file path as currentNode.music
      * currentNode stores audio file sources as simply "audio/..."
@@ -709,6 +758,16 @@ function showNode(nodePointer){
     
     let nextBgMusic = currentNode.music;
 
+    if(previousBgMusic != nextBgMusic){
+        backgroundMusic.src = nextBgMusic;
+        backgroundMusic.play();
+        /**
+         * This is a way of having it so the same audio continues throughout instead of restarting at the beginning whenever the player
+         * enter a new room. Basically it checks if the audio from the previous room is the same as the next room, if it isn't then it makes
+         * the audio src the same as the next room and plays it. This is why the formatting above was needed.
+         * - Sam
+         */
+    }
     while(btnOptions.firstChild){
         btnOptions.removeChild(btnOptions.firstChild);
     }
@@ -767,12 +826,20 @@ document.addEventListener("touchmove", getMousePosition);
 
 setInterval(startUp, 999);
 function startUp() {
+
 if (gameTimer == 1) {
     //Basically occurs once the game starts
     setInterval(masterEntry, 1000)
-    setTimeout(wipeJournal, 15000)
+    setTimeout(wipeJournal, 1500)
+    }
 }
-}
+
+setInterval(() => {
+    if (gameTimer >= 300){
+        gameComplete();
+    }
+}, 1*1000);
+
 //Validations to ensure the player only takes the journal entries once
 let onceOnly = false;
 let onceOnly2 = false;
@@ -1198,3 +1265,4 @@ const textNodesArray = [
         ]
     }
 ];
+// I think it'll be best to not place any thing beneath this so you don't have to scroll down all the rooms to get to something down here
