@@ -745,8 +745,12 @@ function showNode(nodePointer){
     let previousBgMusic = backgroundMusic.src;
 
     let splitted = previousBgMusic.split("Code/");
-    previousBgMusic = splitted[1];
-    previousBgMusic = previousBgMusic.replace("%20"," ");
+    if (splitted.length > 1 && splitted[1]) {
+        previousBgMusic = splitted[1].replace("%20"," ");
+    } else {
+        previousBgMusic = "";
+    }
+
     /**
      * This is basically a way of formating the file path so that it is the same as the file path as currentNode.music
      * currentNode stores audio file sources as simply "audio/..."
