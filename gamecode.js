@@ -241,7 +241,7 @@ function diceRollRange(max){
     // One major issue I noticed with the API is that it sometimes returned numbers that were outside of the range I gave it
     // For example, if the max number was 2, meaning it had to generate a number between 1 and 2, it would sometime return 3
     // This causes the Midnight Man to break completely.
-    // The code below checks if such an instance has occured and overrules the number with a random number generator instead.
+    // The code below checks if such an instance has occurred and overrules the number with a random number generator instead.
     if (rangeDiceResult[0] > max){
         console.log("There is an error!!");
         rangeDiceResult.pop()
@@ -482,7 +482,7 @@ function countdown(){
         // Print first warning message
     } else if(remaining == 15){
         // Print second warning message
-        // Disortion Effects
+        // Distortion Effects
     } else if(remaining == 5){
         // Print final warning message
         // Sound Effects
@@ -757,7 +757,6 @@ function showNode(nodePointer){
      * but the storing the actual src as a variable gives the entire file name in the drive e.g "file:////C:/Users/..."
      * It splits the string by The 27/ in the folder name Group 27 - So if we ever change the main folder's name - remember to change the .split as well,
      * After splitting it then replaces and %20 in the file name to be a simple space.
-     * - Sam
      */
     
     let nextBgMusic = currentNode.music;
@@ -801,7 +800,7 @@ function selectOption(playerOption){
     const nextNode = playerOption.nextId;
     delay(1000).then(() => showNode(nextNode));
     delay(1000).then(() => document.body.style.animation="fadein 0.5s forwards");
-    timerEvent(); // Intialises the countdown to prevent the user from staying in the same room for too long.
+    timerEvent(); // Initialises the countdown to prevent the user from staying in the same room for too long.
 }
 
 
@@ -821,7 +820,7 @@ const isTouchDevice = () => {
 function getMousePosition(e) {
     mouseX = !isTouchDevice() ? e.pageX : e.touches[0].pageX;
     mouseY = !isTouchDevice() ? e.pageY : e.touches[0].pageY;
-    flashlight.style.setProperty("--Xpos", (mouseX-200) + "px"); //if this seems buggy its because on my laptop I had to remove 200px, u might not need to.
+    flashlight.style.setProperty("--Xpos", (mouseX-200) + "px");
     flashlight.style.setProperty("--Ypos", mouseY + "px");
 }
 
